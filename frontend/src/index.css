@@ -1,10 +1,1 @@
-html { background: #070817; }
-
-body {
-  margin: 0;
-  min-width: 320px;
-}
-
-#root {
-  min-height: 100vh;
-}
+html{background:#0b1020;scroll-behavior:smooth}body{margin:0;min-width:320px;background:#0b1020;color:#eef3ff}#root{min-height:100vh}

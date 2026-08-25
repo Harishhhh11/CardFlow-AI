@@ -1,13 +1,27 @@
 $ErrorActionPreference = "Continue"
 
+# Automatically detect the currently checked-out branch
+$branch = git branch --show-current
+
+if (-not $branch) {
+
+    Write-Host ""
+    Write-Host "Error: Unable to detect the current Git branch." -ForegroundColor Red
+
+    exit
+
+}
+
+Write-Host ""
+Write-Host "CardFlow AI Auto Pull Started" -ForegroundColor Green
+Write-Host "Tracking branch: $branch" -ForegroundColor Cyan
+Write-Host ""
+
 while ($true) {
 
     try {
 
-        # Check the latest changes from GitHub
-        git fetch origin main
-
-        # Check whether local files have uncommitted changes
+        # Check for local uncommitted changes
         $status = git status --porcelain
 
         if ($status) {
@@ -18,19 +32,36 @@ while ($true) {
         }
         else {
 
-            # Compare local main with GitHub main
-            $local = git rev-parse HEAD
-            $remote = git rev-parse origin/main
+            # Fetch the latest data for the CURRENT branch
+            git fetch origin $branch
 
+            # Get the current local commit
+            $local = git rev-parse HEAD
+
+            # Get the latest remote commit
+            $remote = git rev-parse "origin/$branch"
+
+            # Compare commits
             if ($local -ne $remote) {
 
                 Write-Host ""
                 Write-Host "New changes detected on GitHub..." -ForegroundColor Cyan
 
-                git pull --ff-only origin main
+                # Pull only if fast-forward is possible
+                git pull --ff-only origin $branch
 
-                Write-Host ""
-                Write-Host "VS Code project updated from GitHub." -ForegroundColor Green
+                if ($LASTEXITCODE -eq 0) {
+
+                    Write-Host ""
+                    Write-Host "VS Code project updated from GitHub." -ForegroundColor Green
+
+                }
+                else {
+
+                    Write-Host ""
+                    Write-Host "Unable to automatically update the project." -ForegroundColor Red
+
+                }
 
             }
             else {
@@ -50,4 +81,5 @@ while ($true) {
     }
 
     Start-Sleep -Seconds 30
+
 }
