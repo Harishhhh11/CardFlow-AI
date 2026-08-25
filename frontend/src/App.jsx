@@ -144,7 +144,23 @@ function UploadScreen({ side1Preview, side2Preview, error, onFileChange, onOpenC
   return <section className="screen screen-upload screen-enter">
     <div className="hero-section">
       <div className="hero-copy"><div className="hero-chip"><span>✦</span> AI VISITING CARD SCANNER</div><h2>Turn every card into a <span>smart contact.</span></h2><p>Capture a visiting card, let CardFlow AI extract the details, review the result, and save a clean contact in moments.</p><div className="hero-features"><div><span>✦</span>AI extraction</div><div><span>✓</span>Review before save</div><div><span>⚡</span>Fast processing</div></div><div className="hero-visual-note"><span className="hero-visual-dot" />Built for fast contact capture</div></div>
-      <div className="hero-visual" aria-hidden="true"><div className="hero-card-stack card-back" /><div className="hero-card-stack card-middle" /><div className="hero-ai-card"><div className="ai-card-top"><div className="mini-profile"><span /></div><div><strong>Contact detected</strong><small>Ready for review</small></div><div className="ai-pulse">✦</div></div><div className="ai-lines"><span/><span/><span/><span/></div><div className="hero-scan-line"/></div><div className="floating-tag tag-one">✦ AI Extracted</div><div className="floating-tag tag-two">✓ Ready to Save</div></div>
+      <div className="hero-visual" aria-hidden="true">
+        <div className="hero-orbit" />
+        <div className="hero-card-animation">
+          <div className="hero-card-glow" />
+          <div className="hero-card hero-card-back"><div className="card-stripe"/><div className="card-chip"/><div className="card-mini-lines"><span/><span/><span/></div></div>
+          <div className="hero-card hero-card-middle"><div className="card-stripe"/><div className="card-chip"/><div className="card-mini-lines"><span/><span/><span/></div></div>
+          <div className="hero-card hero-card-front">
+            <div className="card-header-row"><div className="card-mark">CF</div><div className="card-name-block"><strong>CardFlow AI</strong><small>Smart contact capture</small></div><span className="card-spark">✦</span></div>
+            <div className="card-portrait"><span/></div>
+            <div className="card-person"><strong>Alex Morgan</strong><small>Product Consultant</small></div>
+            <div className="card-contact-lines"><span/><span/><span/></div>
+            <div className="card-ai-scan-line"/>
+            <div className="card-corner card-corner-tl"/><div className="card-corner card-corner-tr"/><div className="card-corner card-corner-bl"/><div className="card-corner card-corner-br"/>
+          </div>
+        </div>
+        <div className="floating-tag tag-one">✦ AI Extracted</div><div className="floating-tag tag-two">✓ Ready to Save</div><div className="floating-tag tag-three">98% confidence</div>
+      </div>
     </div>
     <section className="scanner-panel home-capture-panel"><div className="panel-heading advanced-panel-heading"><div><div className="section-number"><span>01</span><small>CAPTURE</small></div><h2>Bring in your card</h2><p>Front side is required. Add the back side when it contains more contact information.</p></div><div className="capture-trust"><strong>Private by design</strong><span>Images are only used for extraction.</span></div></div>
       <div className="scanner-grid"><CardUploader title="Front Side" required preview={side1Preview} onFileChange={(file)=>onFileChange(file,"side1")} onOpenCamera={()=>onOpenCamera("side1")} onRemove={()=>onRemove("side1")} /><CardUploader title="Back Side" required={false} preview={side2Preview} onFileChange={(file)=>onFileChange(file,"side2")} onOpenCamera={()=>onOpenCamera("side2")} onRemove={()=>onRemove("side2")} /></div>
