@@ -436,87 +436,108 @@ function ProcessingScreen({ side1Preview, side2Preview, processingText, processi
 }
 
 function ProcessingItem({ done, active, number, text }) {
-  return <div className={`processing-item ${done ? "completed" : ""} ${active ? "active" : ""}`}><span>{done ? "✓" : active ? <i /> : number}</span>{text}</div>;
+  return (
+    <div className={`processing-item ${done ? "done" : ""} ${active ? "active" : ""}`}>
+      <span className="processing-item-marker">{done ? "✓" : number}</span><span>{text}</span>
+    </div>
+  );
 }
 
 function ReviewScreen({ contact, side1Preview, side2Preview, error, onBack, onSave, updateField, updateListField, addListItem, removeListItem }) {
+  const scalarFields = [
+    ["name", "Full Name", "The person's name"],
+    ["company_name", "Company", "Company or organization"],
+    ["designation", "Designation", "Job title or role"],
+    ["website", "Website", "Company or personal website"],
+    ["linkedin", "LinkedIn", "LinkedIn profile URL"],
+    ["address", "Address", "Address or office location"],
+    ["other_details", "Other Details", "Any additional information"]
+  ];
+
   return (
     <section className="screen-review screen-enter">
       <div className="review-header">
-        <button type="button" className="back-button" onClick={onBack}>←<span>Back to card</span></button>
         <div className="review-title">
-          <div className="section-number"><span>02</span><small>REVIEW & EDIT</small></div>
-          <h2>AI found your<span>contact details.</span></h2>
-          <p>Review the extracted information below. You can edit anything before saving.</p>
+          <div className="section-number"><span>02</span><small>REVIEW</small></div>
+          <h2>Review your extracted contact</h2>
+          <p>Check the AI output and make any corrections before saving.</p>
         </div>
-        <div className="extraction-complete"><div className="complete-icon">✓</div><div><strong>Extraction complete</strong><small>Ready for review</small></div></div>
+        <div className="review-confidence"><span className="confidence-dot" /> AI extraction complete</div>
       </div>
 
-      {error && <div className="inline-error review-error"><span>⚠</span>{error}</div>}
-
       <div className="review-layout">
-        <aside className="review-sidebar">
-          <div className="card-preview-title"><span>ORIGINAL</span><strong>CARD PREVIEW</strong></div>
-          {side1Preview && <div className="review-card-image"><img src={side1Preview} alt="Front side of visiting card" /></div>}
-          {side2Preview && <div className="review-card-image secondary-preview"><img src={side2Preview} alt="Back side of visiting card" /></div>}
-          <button type="button" className="change-card-button" onClick={onBack}>↺ Change card images</button>
+        <aside className="review-card-preview">
+          <div className="preview-card-label">SOURCE IMAGE</div>
+          <div className="review-image-wrap">
+            {side1Preview && <img src={side1Preview} alt="Front side of visiting card" />}
+          </div>
+          {side2Preview && <div className="review-image-wrap review-back-preview"><img src={side2Preview} alt="Back side of visiting card" /></div>}
+          <div className="preview-note">Your original images stay attached to this review for easy verification.</div>
         </aside>
 
-        <section className="contact-editor">
-          <div className="editor-header">
-            <div><span className="editor-eyebrow">CONTACT INFORMATION</span><h3>Extracted details</h3></div>
-            <div className="editor-status"><span />Ready to save</div>
-          </div>
+        <div className="editor-panel">
+          <div className="editor-header"><div><span className="editor-kicker">STRUCTURED CONTACT</span><h3>Edit details</h3></div><span className="editor-ai-badge">✦ AI</span></div>
 
-          <div className="form-section">
-            <div className="form-section-title"><div className="form-title-icon">👤</div><div><h4>Basic information</h4><p>Personal and professional details</p></div></div>
-            <div className="advanced-form-grid">
-              <FormField label="Full Name" value={contact.name} placeholder="Enter full name" onChange={(value) => updateField("name", value)} />
-              <FormField label="Company / Organization" value={contact.company_name} placeholder="Enter company name" onChange={(value) => updateField("company_name", value)} />
-              <FormField label="Designation" value={contact.designation} placeholder="Enter designation" onChange={(value) => updateField("designation", value)} />
-              <FormField label="Website" value={contact.website} placeholder="www.example.com" onChange={(value) => updateField("website", value)} />
-              <FormField label="LinkedIn" value={contact.linkedin} placeholder="LinkedIn profile" onChange={(value) => updateField("linkedin", value)} />
-            </div>
-          </div>
+          {scalarFields.map(([field, label, placeholder]) => (
+            <label className="field-group" key={field}>
+              <span>{label}</span>
+              {field === "other_details" || field === "address" ? (
+                <textarea value={contact[field] || ""} placeholder={placeholder} rows={field === "other_details" ? 3 : 2} onChange={(event) => updateField(field, event.target.value)} />
+              ) : (
+                <input value={contact[field] || ""} placeholder={placeholder} onChange={(event) => updateField(field, event.target.value)} />
+              )}
+            </label>
+          ))}
 
-          <div className="form-section"><EditableList label="Mobile Numbers" icon="📱" description="Phone and mobile contact numbers" field="mobile_numbers" values={contact.mobile_numbers || []} placeholder="+91 98765 43210" onChange={updateListField} onAdd={addListItem} onRemove={removeListItem} /></div>
-          <div className="form-section"><EditableList label="Email Addresses" icon="✉" description="Email contact information" field="email_addresses" values={contact.email_addresses || []} placeholder="name@example.com" onChange={updateListField} onAdd={addListItem} onRemove={removeListItem} /></div>
+          <ListEditor field="mobile_numbers" label="Mobile Numbers" placeholder="Enter phone number" values={contact.mobile_numbers || []} updateListField={updateListField} addListItem={addListItem} removeListItem={removeListItem} />
+          <ListEditor field="email_addresses" label="Email Addresses" placeholder="name@example.com" values={contact.email_addresses || []} updateListField={updateListField} addListItem={addListItem} removeListItem={removeListItem} />
 
-          <div className="form-section">
-            <div className="form-section-title"><div className="form-title-icon">📍</div><div><h4>Address</h4><p>Business or office location</p></div></div>
-            <div className="text-field-group"><textarea value={contact.address || ""} placeholder="Enter complete address" onChange={(event) => updateField("address", event.target.value)} /></div>
-          </div>
-
-          <div className="form-section">
-            <div className="form-section-title"><div className="form-title-icon">✦</div><div><h4>Additional details</h4><p>Any other useful information found on the card</p></div></div>
-            <div className="text-field-group"><textarea value={contact.other_details || ""} placeholder="Additional notes or information" onChange={(event) => updateField("other_details", event.target.value)} /></div>
-          </div>
+          {error && <div className="inline-error review-error"><span>⚠</span>{error}</div>}
 
           <div className="save-contact-footer">
-            <div className="save-copy"><div className="save-step">STEP 03</div><h3>Everything looks good?</h3><p>Save this verified contact to your database.</p></div>
-            <div className="save-actions"><button type="button" className="secondary-back-button" onClick={onBack}>← Back</button><button type="button" className="save-contact-button" onClick={onSave}><span>Save Contact</span><span>→</span></button></div>
+            <button type="button" className="secondary-button" onClick={onBack}>← Back to scan</button>
+            <button type="button" className="save-contact-button" onClick={onSave}><span>Save Contact</span><span>✓</span></button>
           </div>
-        </section>
+        </div>
       </div>
     </section>
   );
 }
 
+function ListEditor({ field, label, placeholder, values, updateListField, addListItem, removeListItem }) {
+  return (
+    <div className="list-field-group">
+      <div className="list-field-heading"><span>{label}</span><button type="button" className="add-item-button" onClick={() => addListItem(field)}>+ Add</button></div>
+      {values.length === 0 ? <div className="empty-list-note">No {label.toLowerCase()} detected. Add one if needed.</div> : values.map((value, index) => (
+        <div className="list-row" key={`${field}-${index}`}><input value={value || ""} placeholder={placeholder} onChange={(event) => updateListField(field, index, event.target.value)} /><button type="button" className="remove-item-button" onClick={() => removeListItem(field, index)} aria-label={`Remove ${label} ${index + 1}`}>×</button></div>
+      ))}
+    </div>
+  );
+}
+
 function SavingScreen() {
-  return <section className="saving-screen screen-enter"><div className="saving-card"><div className="saving-animation"><div className="saving-circle"><span>↑</span></div></div><span className="saving-label">SAVING CONTACT</span><h2>Almost there...</h2><p>We're securely saving your verified contact information.</p><div className="saving-progress"><span /></div></div></section>;
+  return (
+    <section className="saving-screen screen-enter">
+      <div className="saving-spinner"><span /></div>
+      <div className="saving-label">03 • SAVING</div>
+      <h2>Securing your contact<span>in CardFlow.</span></h2>
+      <p>We are saving your corrected contact details now.</p>
+    </section>
+  );
 }
 
 function SuccessScreen({ contact, savedContactName, onNewScan }) {
-  const initials = (savedContactName || "C").split(" ").filter(Boolean).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
-  return <section className="success-screen screen-enter"><div className="success-confetti confetti-one">✦</div><div className="success-confetti confetti-two">●</div><div className="success-confetti confetti-three">✦</div><div className="success-confetti confetti-four">●</div><div className="success-card"><div className="success-icon-wrapper"><div className="success-ring ring-a" /><div className="success-ring ring-b" /><div className="success-icon">✓</div></div><span className="success-eyebrow">SUCCESSFULLY SAVED</span><h2>Contact added<span>successfully!</span></h2><p>{savedContactName || "Your contact"} has been saved successfully. Your contact is now ready to use.</p><div className="success-contact-summary"><div className="success-avatar">{initials}</div><div><strong>{savedContactName || "New Contact"}</strong><small>{contact?.company_name || "Contact saved to your database"}</small></div><span className="success-check">✓</span></div><button type="button" className="scan-new-card-button" onClick={onNewScan}><span className="new-scan-icon">+</span><span>Scan another card</span><span className="button-arrow">→</span></button><button type="button" className="simple-home-button" onClick={onNewScan}>Return to home</button></div></section>;
-}
-
-function FormField({ label, value, placeholder, onChange }) {
-  return <div className="advanced-form-field"><label>{label}</label><input type="text" value={value || ""} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /></div>;
-}
-
-function EditableList({ label, icon, description, field, values, placeholder, onChange, onAdd, onRemove }) {
-  return <div className="editable-list"><div className="form-section-title"><div className="form-title-icon">{icon}</div><div><h4>{label}</h4><p>{description}</p></div></div>{values.length === 0 && <div className="empty-list">No details extracted. You can add one manually.</div>}{values.map((value, index) => <div className="editable-list-item" key={`${field}-${index}`}><input type="text" value={value || ""} placeholder={placeholder} onChange={(event) => onChange(field, index, event.target.value)} /><button type="button" onClick={() => onRemove(field, index)} title="Remove">✕</button></div>)}<button type="button" className="add-detail-button" onClick={() => onAdd(field)}>+ Add another</button></div>;
+  return (
+    <section className="success-screen screen-enter">
+      <div className="success-icon"><span>✓</span></div>
+      <div className="success-content">
+        <div className="success-label">CONTACT SAVED SUCCESSFULLY</div>
+        <h2>{savedContactName || contact?.name || "Contact"}<span>is ready.</span></h2>
+        <p>The extracted details are now safely stored in your CardFlow contact list.</p>
+        <button type="button" className="scan-new-card-button" onClick={onNewScan}>Scan another card <span>→</span></button>
+      </div>
+    </section>
+  );
 }
 
 export default App;
