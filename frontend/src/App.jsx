@@ -19,12 +19,10 @@ const EMPTY_CONTACT = {
 };
 
 const PROCESSING_STEPS = [
-  "Preparing your card for analysis...",
-  "Enhancing image quality...",
-  "Reading contact information...",
-  "Identifying names and organizations...",
-  "Extracting phone numbers and emails...",
-  "Structuring your contact details..."
+  { title: "Reading card image", detail: "Checking image quality and detecting card boundaries." },
+  { title: "Extracting contact details", detail: "Finding names, companies, phone numbers and email addresses." },
+  { title: "Structuring information", detail: "Organizing detected details into clean contact fields." },
+  { title: "Preparing review", detail: "Finalizing the extracted contact for your review." }
 ];
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -42,7 +40,7 @@ function App() {
   const [processingIndex, setProcessingIndex] = useState(0);
   const [savedContactName, setSavedContactName] = useState("");
 
-  const processingText = PROCESSING_STEPS[processingIndex];
+  const processingStep = PROCESSING_STEPS[processingIndex];
 
   useEffect(() => {
     if (currentStep !== "processing") return undefined;
@@ -134,6 +132,7 @@ function App() {
         email_addresses: Array.isArray(data.email_addresses) ? data.email_addresses : []
       });
 
+      setProcessingIndex(PROCESSING_STEPS.length - 1);
       setCurrentStep("review");
     } catch (err) {
       console.error("SCAN ERROR:", err);
@@ -277,8 +276,8 @@ function App() {
           <ProcessingScreen
             side1Preview={side1Preview}
             side2Preview={side2Preview}
-            processingText={processingText}
             processingIndex={processingIndex}
+            processingStep={processingStep}
           />
         )}
 
@@ -399,36 +398,58 @@ function UploadScreen({ side1Preview, side2Preview, error, onFileChange, onOpenC
   );
 }
 
-function ProcessingScreen({ side1Preview, side2Preview, processingText, processingIndex }) {
-  const completedCount = Math.min(processingIndex, 4);
+function ProcessingScreen({ side1Preview, side2Preview, processingIndex, processingStep }) {
+  const progress = ((processingIndex + 1) / PROCESSING_STEPS.length) * 100;
 
   return (
     <section className="processing-screen screen-enter">
       <div className="processing-glow" />
-      <div className="processing-card">
-        <div className="processing-visual">
+      <div className="processing-card processing-card-enhanced">
+        <div className="processing-visual processing-visual-enhanced">
           <div className="processing-rings ring-one" />
           <div className="processing-rings ring-two" />
           <div className="processing-rings ring-three" />
           <div className="processing-card-preview">
             {side1Preview ? <img src={side1Preview} alt="Card being analyzed" /> : <span>🪪</span>}
             <div className="processing-scan-line" />
+            <div className="scan-corners" aria-hidden="true">
+              <i className="corner tl" /><i className="corner tr" /><i className="corner bl" /><i className="corner br" />
+            </div>
           </div>
           {side2Preview && <div className="processing-side-two"><img src={side2Preview} alt="Back side being analyzed" /></div>}
-          <div className="processing-core"><span>✦</span></div>
+          <div className="processing-core processing-core-enhanced"><span>✦</span></div>
+          <div className="processing-live-chip"><span className="live-dot" /> AI ACTIVE</div>
         </div>
 
-        <div className="processing-content">
-          <div className="processing-label">CARD ANALYSIS IN PROGRESS</div>
-          <h2>Our AI is reading<span>your card.</span></h2>
-          <p>Please wait while we analyze the image and organize the contact information.</p>
-          <div className="processing-status"><div className="status-spinner"><span /></div><span>{processingText}</span></div>
-          <div className="processing-checklist">
-            <ProcessingItem done={completedCount >= 1} active={processingIndex === 0} number="1" text="Image received" />
-            <ProcessingItem done={completedCount >= 2} active={processingIndex === 1 || processingIndex === 2} number="2" text="AI extracting information" />
-            <ProcessingItem done={completedCount >= 3} active={processingIndex === 3 || processingIndex === 4} number="3" text="Organizing contact details" />
-            <ProcessingItem done={processingIndex >= 5} active={processingIndex === 5} number="4" text="Preparing review" />
+        <div className="processing-content processing-content-enhanced">
+          <div className="processing-label">CARD EXTRACTION</div>
+          <div className="processing-step-count">STEP {String(processingIndex + 1).padStart(2, "0")} <span>OF {String(PROCESSING_STEPS.length).padStart(2, "0")}</span></div>
+          <h2>{processingStep.title}<span>...</span></h2>
+          <p>{processingStep.detail}</p>
+
+          <div className="extraction-progress">
+            <div className="extraction-progress-top"><span>Extraction progress</span><strong>{Math.round(progress)}%</strong></div>
+            <div className="extraction-progress-track"><span style={{ width: `${progress}%` }} /></div>
           </div>
+
+          <div className="extraction-steps">
+            {PROCESSING_STEPS.map((step, index) => {
+              const completed = index < processingIndex;
+              const current = index === processingIndex;
+              return (
+                <div className={`extraction-step ${completed ? "completed" : ""} ${current ? "current" : ""}`} key={step.title}>
+                  <div className="extraction-step-marker">{completed ? "✓" : String(index + 1).padStart(2, "0")}</div>
+                  <div className="extraction-step-copy">
+                    <strong>{step.title}</strong>
+                    <small>{current ? "Processing now" : completed ? "Completed" : "Waiting"}</small>
+                  </div>
+                  {current && <div className="step-pulse" />}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="processing-note"><span>✦</span> Keep this window open while CardFlow AI finishes extracting the details.</div>
         </div>
       </div>
     </section>
@@ -468,9 +489,7 @@ function ReviewScreen({ contact, side1Preview, side2Preview, error, onBack, onSa
       <div className="review-layout">
         <aside className="review-card-preview">
           <div className="preview-card-label">SOURCE IMAGE</div>
-          <div className="review-image-wrap">
-            {side1Preview && <img src={side1Preview} alt="Front side of visiting card" />}
-          </div>
+          <div className="review-image-wrap">{side1Preview && <img src={side1Preview} alt="Front side of visiting card" />}</div>
           {side2Preview && <div className="review-image-wrap review-back-preview"><img src={side2Preview} alt="Back side of visiting card" /></div>}
           <div className="preview-note">Your original images stay attached to this review for easy verification.</div>
         </aside>
