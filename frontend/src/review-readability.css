@@ -1,0 +1,34 @@
+/* CardFlow readability override */
+.review-hero h2{font-size:clamp(46px,5vw,64px)!important;line-height:1.02!important;color:#0d1423!important}
+.review-hero p{font-size:16px!important;line-height:1.75!important;color:#526078!important}
+.review-ready-badge{font-size:11px!important;padding:10px 14px!important}
+.review-workspace{grid-template-columns:350px minmax(0,1fr)!important;gap:32px!important}
+.source-panel{padding:22px!important;border-radius:25px!important;box-shadow:0 20px 44px rgba(24,37,64,.09)!important}
+.source-panel-top h3{font-size:26px!important}
+.source-kicker{font-size:10px!important}
+.source-insight strong{font-size:12px!important}
+.source-insight p{font-size:9px!important}
+.contact-editor{padding:0 26px 24px!important;border-radius:26px!important;box-shadow:0 24px 60px rgba(24,37,64,.1)!important}
+.editor-header-rich{padding:24px 5px 21px!important}
+.editor-header-rich h3{font-size:32px!important}
+.editor-header-rich p{font-size:12px!important}
+.editor-kicker{font-size:10px!important}
+.editor-section-card{padding:20px!important;margin-top:18px!important;border-radius:19px!important}
+.editor-section-heading strong{font-size:15px!important}
+.editor-section-heading small{font-size:9px!important}
+.field-group span{font-size:12px!important;color:#37465e!important}
+.field-group input,.field-group textarea{font-size:15px!important;padding:14px 15px!important;border-radius:12px!important;color:#101c2e!important}
+.field-group textarea{min-height:108px!important}
+.list-field-heading>div>span{font-size:12px!important}
+.list-field-heading small{font-size:9px!important}
+.list-row input{font-size:14px!important;padding:13px 14px!important}
+.add-item-button{font-size:10px!important;padding:8px 11px!important}
+.remove-item-button{width:34px!important;height:34px!important}
+.save-contact-footer.rich{padding-top:18px!important}
+.save-footer-copy span{font-size:12px!important}
+.save-footer-copy small{font-size:9px!important}
+.secondary-button{font-size:10px!important;padding:11px 14px!important}
+.save-contact-footer .save-contact-button{min-width:250px!important;padding:15px 22px!important;font-size:13px!important;border-radius:13px!important}
+@media(max-width:980px){.review-workspace{grid-template-columns:1fr!important}.source-panel{position:static}}
+@media(max-width:760px){.review-hero h2{font-size:42px!important}.review-hero p{font-size:13px!important}.contact-editor{padding:0 17px 17px!important}.editor-header-rich h3{font-size:27px!important}.editor-section-card{padding:15px!important}.field-group span{font-size:11px!important}.field-group input,.field-group textarea{font-size:14px!important;padding:12px!important}.list-row input{font-size:13px!important}}
+@media(max-width:520px){.review-hero h2{font-size:35px!important}.review-hero p{font-size:12px!important}.source-panel-top h3{font-size:23px!important}.editor-header-rich h3{font-size:23px!important}.field-group input,.field-group textarea{font-size:13px!important}.list-row input{font-size:12px!important}.save-contact-footer .save-contact-button{min-width:100%!important}}
